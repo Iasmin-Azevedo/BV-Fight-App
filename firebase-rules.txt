@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Regras para usuários autenticados - mais permissiva para testes
+    match /usuarios/{userId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Regras para treinos - mais permissiva para testes
+    match /treinos/{treinoId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Regras para check-ins
+    match /checkins/{checkinId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Regras para atletas - mais permissiva para testes
+    match /atletas/{atletaId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Regras para alunos - mais permissiva para testes
+    match /alunos/{alunoId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Regras para técnicas - mais permissiva para testes
+    match /tecnicas/{tecnicaId} {
+      allow read, write: if request.auth != null;
+    }
+    
+        // Regras para progresso de faixas - mais permissiva para testes
+        match /progresso_faixas/{progressoId} {
+          allow read, write: if request.auth != null;
+        }
+
+        // Regras para agendamentos semanais - mais permissiva para testes
+        match /agendamentos_semanais/{agendamentoId} {
+          allow read, write: if request.auth != null;
+        }
+      }
+    }
