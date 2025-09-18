@@ -21,8 +21,7 @@ Aplicativo móvel para aprendizado e gerenciamento de jiu-jitsu, desenvolvido co
 
 1. Clone o repositório:
 ```bash
-git clone <url-do-repositorio>
-cd TatameDigitalApp
+git clone https://github.com/Iasmin-Azevedo/BV-Fight
 ```
 
 2. Instale as dependências:
@@ -94,8 +93,8 @@ app/
 - **Expo Router**: Sistema de navegação
 - **React Native Vector Icons**: Sistema de ícones
 
+## Desenvolvimento
 
+- **Iasmin Azevedo**
+- **Programação para Dispositivos Moveis - IFCE Campus Boa Viagem**
 
-## 📄 Licença
-
-Este projeto está sob a licença MIT.
