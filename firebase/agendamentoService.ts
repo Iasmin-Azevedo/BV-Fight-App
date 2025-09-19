@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface AgendamentoSemanal {
@@ -45,19 +45,29 @@ export class AgendamentoService {
     try {
       console.log('AgendamentoService: Buscando todos os agendamentos');
       
-      const q = query(
-        collection(db, this.COLLECTION),
-        orderBy('diaSemana', 'asc'),
-        orderBy('horarioInicio', 'asc')
-      );
-      
+      // Buscar sem orderBy para evitar necessidade de índice composto
+      const q = query(collection(db, this.COLLECTION));
       const querySnapshot = await getDocs(q);
+      
       const agendamentos = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         criadoEm: doc.data().criadoEm.toDate(),
         atualizadoEm: doc.data().atualizadoEm.toDate()
       })) as AgendamentoSemanal[];
+
+      // Ordenar no cliente para evitar necessidade de índice composto
+      agendamentos.sort((a, b) => {
+        const diasSemana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+        const indexA = diasSemana.indexOf(a.diaSemana);
+        const indexB = diasSemana.indexOf(b.diaSemana);
+        
+        if (indexA !== indexB) {
+          return indexA - indexB;
+        }
+        
+        return a.horarioInicio.localeCompare(b.horarioInicio);
+      });
 
       console.log('AgendamentoService: Agendamentos encontrados:', agendamentos.length);
       return agendamentos;
@@ -72,11 +82,10 @@ export class AgendamentoService {
     try {
       console.log('AgendamentoService: Buscando agendamentos ativos');
       
+      // Buscar apenas por ativo para evitar necessidade de índice composto
       const q = query(
         collection(db, this.COLLECTION),
-        where('ativo', '==', true),
-        orderBy('diaSemana', 'asc'),
-        orderBy('horarioInicio', 'asc')
+        where('ativo', '==', true)
       );
       
       const querySnapshot = await getDocs(q);
@@ -86,6 +95,19 @@ export class AgendamentoService {
         criadoEm: doc.data().criadoEm.toDate(),
         atualizadoEm: doc.data().atualizadoEm.toDate()
       })) as AgendamentoSemanal[];
+
+      // Ordenar no cliente para evitar necessidade de índice composto
+      agendamentos.sort((a, b) => {
+        const diasSemana = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+        const indexA = diasSemana.indexOf(a.diaSemana);
+        const indexB = diasSemana.indexOf(b.diaSemana);
+        
+        if (indexA !== indexB) {
+          return indexA - indexB;
+        }
+        
+        return a.horarioInicio.localeCompare(b.horarioInicio);
+      });
 
       console.log('AgendamentoService: Agendamentos ativos encontrados:', agendamentos.length);
       return agendamentos;
@@ -100,11 +122,11 @@ export class AgendamentoService {
     try {
       console.log('AgendamentoService: Buscando agendamentos para o dia:', diaSemana);
       
+      // Buscar por dia e ativo, sem orderBy para evitar índice composto
       const q = query(
         collection(db, this.COLLECTION),
         where('diaSemana', '==', diaSemana),
-        where('ativo', '==', true),
-        orderBy('horarioInicio', 'asc')
+        where('ativo', '==', true)
       );
       
       const querySnapshot = await getDocs(q);
@@ -114,6 +136,9 @@ export class AgendamentoService {
         criadoEm: doc.data().criadoEm.toDate(),
         atualizadoEm: doc.data().atualizadoEm.toDate()
       })) as AgendamentoSemanal[];
+
+      // Ordenar por horário no cliente
+      agendamentos.sort((a, b) => a.horarioInicio.localeCompare(b.horarioInicio));
 
       console.log('AgendamentoService: Agendamentos do dia encontrados:', agendamentos.length);
       return agendamentos;

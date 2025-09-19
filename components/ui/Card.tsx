@@ -1,8 +1,8 @@
-import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { ThemedText } from '@/components/ThemedText';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface CardProps {
   children: React.ReactNode;
@@ -87,7 +87,7 @@ export function Card({
     <CardComponent
       style={[
         styles.card,
-        { backgroundColor: Colors[colorScheme].card },
+        { backgroundColor: Colors[colorScheme || 'light'].card },
         rounded && styles.rounded,
         getElevationStyle(),
         getPaddingStyle(),

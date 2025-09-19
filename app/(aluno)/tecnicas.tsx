@@ -51,11 +51,11 @@ export default function TecnicasScreen() {
       `${tecnica.descricao}\n\nCategoria: ${tecnica.categoria}\nPosição: ${tecnica.posicao}\nNível: ${tecnica.nivel}`,
       [
         { text: 'Fechar', style: 'cancel' },
-        tecnica.videoUrl ? { text: 'Ver Vídeo', onPress: () => {
+        ...(tecnica.videoUrl ? [{ text: 'Ver Vídeo', onPress: () => {
           // Aqui você pode abrir o vídeo
           console.log('Abrir vídeo:', tecnica.videoUrl);
-        }} : null
-      ].filter(Boolean)
+        }}] : [])
+      ]
     );
   };
 
@@ -71,12 +71,12 @@ export default function TecnicasScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 
         {/* Campo de busca */}
-        <View style={[styles.searchContainer, { backgroundColor: Colors[colorScheme].card }]}>
-          <IconSymbol name="magnifyingglass" size={20} color={Colors[colorScheme].icon} />
+        <View style={[styles.searchContainer, { backgroundColor: Colors[colorScheme || 'light'].card }]}>
+          <IconSymbol name="magnifyingglass" size={20} color={Colors[colorScheme || 'light'].icon} />
           <TextInput
-            style={[styles.searchInput, { color: Colors[colorScheme].text }]}
+            style={[styles.searchInput, { color: Colors[colorScheme || 'light'].text }]}
             placeholder="Buscar técnicas..."
-            placeholderTextColor={Colors[colorScheme].icon}
+            placeholderTextColor={Colors[colorScheme || 'light'].icon}
             value={searchTerm}
             onChangeText={setSearchTerm}
           />
@@ -89,7 +89,7 @@ export default function TecnicasScreen() {
               key={category}
               style={[
                 styles.categoryButton,
-                selectedCategory === category && { backgroundColor: Colors[colorScheme].accent }
+                selectedCategory === category && { backgroundColor: Colors[colorScheme || 'light'].accent }
               ]}
               onPress={() => setSelectedCategory(category)}
             >
@@ -111,21 +111,21 @@ export default function TecnicasScreen() {
             </View>
           ) : filteredTecnicas.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <IconSymbol name="book.fill" size={48} color={Colors[colorScheme].icon} />
+              <IconSymbol name="book.fill" size={48} color={Colors[colorScheme || 'light'].icon} />
               <ThemedText style={styles.emptyText}>Nenhuma técnica encontrada</ThemedText>
             </View>
           ) : (
             filteredTecnicas.map((tecnica) => (
             <TouchableOpacity
               key={tecnica.id}
-              style={[styles.tecnicaCard, { backgroundColor: Colors[colorScheme].card }]}
+              style={[styles.tecnicaCard, { backgroundColor: Colors[colorScheme || 'light'].card }]}
               onPress={() => handleTecnicaPress(tecnica)}
             >
               {tecnica.thumbnail ? (
                 <Image source={{ uri: tecnica.thumbnail }} style={styles.tecnicaThumbnail} />
               ) : (
-                <View style={[styles.tecnicaThumbnail, styles.placeholderThumbnail, { backgroundColor: Colors[colorScheme].card }]}>
-                  <IconSymbol name="video.fill" size={32} color={Colors[colorScheme].icon} />
+                <View style={[styles.tecnicaThumbnail, styles.placeholderThumbnail, { backgroundColor: Colors[colorScheme || 'light'].card }]}>
+                  <IconSymbol name="video.fill" size={32} color={Colors[colorScheme || 'light'].icon} />
                 </View>
               )}
               <View style={styles.tecnicaInfo}>
@@ -133,20 +133,20 @@ export default function TecnicasScreen() {
                 <ThemedText style={styles.tecnicaDescricao}>{tecnica.descricao}</ThemedText>
                 <View style={styles.tecnicaDetails}>
                   <View style={styles.detailItem}>
-                    <IconSymbol name="tag.fill" size={12} color={Colors[colorScheme].icon} />
+                    <IconSymbol name="tag.fill" size={12} color={Colors[colorScheme || 'light'].icon} />
                     <ThemedText style={styles.detailText}>{tecnica.categoria}</ThemedText>
                   </View>
                   <View style={styles.detailItem}>
-                    <IconSymbol name="figure.martial.arts" size={12} color={Colors[colorScheme].icon} />
+                    <IconSymbol name="figure.martial.arts" size={12} color={Colors[colorScheme || 'light'].icon} />
                     <ThemedText style={styles.detailText}>{tecnica.posicao}</ThemedText>
                   </View>
                   <View style={styles.detailItem}>
-                    <IconSymbol name="star.fill" size={12} color={Colors[colorScheme].icon} />
+                    <IconSymbol name="star.fill" size={12} color={Colors[colorScheme || 'light'].icon} />
                     <ThemedText style={styles.detailText}>{tecnica.nivel}</ThemedText>
                   </View>
                 </View>
                 <View style={styles.playButton}>
-                  <IconSymbol name="play.circle.fill" size={24} color={Colors[colorScheme].accent} />
+                  <IconSymbol name="play.circle.fill" size={24} color={Colors[colorScheme || 'light'].accent} />
                 </View>
               </View>
             </TouchableOpacity>

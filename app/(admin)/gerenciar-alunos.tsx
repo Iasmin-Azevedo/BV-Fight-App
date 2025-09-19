@@ -31,7 +31,8 @@ export default function GerenciarUsuariosScreen() {
     dataNascimento: '',
     genero: 'Masculino',
     faixa: 'Branca',
-    tipo: 'aluno' as 'aluno' | 'admin'
+    tipo: 'aluno' as 'aluno' | 'admin',
+    descricao: ''
   });
 
   // Carregar usuários do Firebase
@@ -66,7 +67,8 @@ export default function GerenciarUsuariosScreen() {
       dataNascimento: '',
       genero: 'Masculino',
       faixa: 'Branca',
-      tipo: 'aluno'
+      tipo: 'aluno',
+      descricao: ''
     });
     setShowAddModal(true);
   };
@@ -116,7 +118,8 @@ export default function GerenciarUsuariosScreen() {
       dataNascimento: usuario.dataNascimento,
       genero: usuario.genero,
       faixa: usuario.faixa,
-      tipo: usuario.tipo
+      tipo: usuario.tipo,
+      descricao: ''
     });
     setShowEditModal(true);
   };
@@ -502,8 +505,8 @@ export default function GerenciarUsuariosScreen() {
                 <ThemedText style={styles.formLabel}>Telefone</ThemedText>
                 <TextInput
                   style={[styles.formInput, { backgroundColor: Colors[theme].card, color: Colors[theme].text }]}
-                  value={formData.telefone}
-                  onChangeText={(text) => setFormData({...formData, telefone: text})}
+                  value={formData.numero}
+                  onChangeText={(text) => setFormData({...formData, numero: text})}
                   placeholder="(11) 99999-9999"
                   placeholderTextColor={Colors[theme].icon}
                   keyboardType="phone-pad"
@@ -542,13 +545,13 @@ export default function GerenciarUsuariosScreen() {
                         key={nivel}
                         style={[
                           styles.pickerOption,
-                          formData.nivel === nivel && { backgroundColor: Colors[theme].accent }
+                          formData.faixa === nivel && { backgroundColor: Colors[theme].accent }
                         ]}
-                        onPress={() => setFormData({...formData, nivel})}
+                        onPress={() => setFormData({...formData, faixa: nivel})}
                       >
                         <ThemedText style={[
                           styles.pickerOptionText,
-                          formData.nivel === nivel && { color: '#FFFFFF' }
+                          formData.faixa === nivel && { color: '#FFFFFF' }
                         ]}>{nivel}</ThemedText>
                       </TouchableOpacity>
                     ))}
@@ -560,8 +563,8 @@ export default function GerenciarUsuariosScreen() {
                 <ThemedText style={styles.formLabel}>Endereço</ThemedText>
                 <TextInput
                   style={[styles.formInput, { backgroundColor: Colors[theme].card, color: Colors[theme].text }]}
-                  value={formData.endereco}
-                  onChangeText={(text) => setFormData({...formData, endereco: text})}
+                  value={formData.numero}
+                  onChangeText={(text) => setFormData({...formData, numero: text})}
                   placeholder="Endereço completo"
                   placeholderTextColor={Colors[theme].icon}
                   multiline
@@ -572,8 +575,8 @@ export default function GerenciarUsuariosScreen() {
                 <ThemedText style={styles.formLabel}>Observações</ThemedText>
                 <TextInput
                   style={[styles.formInput, { backgroundColor: Colors[theme].card, color: Colors[theme].text }]}
-                  value={formData.observacoes}
-                  onChangeText={(text) => setFormData({...formData, observacoes: text})}
+                  value={formData.descricao}
+                  onChangeText={(text) => setFormData({...formData, descricao: text})}
                   placeholder="Observações sobre o aluno"
                   placeholderTextColor={Colors[theme].icon}
                   multiline
@@ -641,8 +644,8 @@ export default function GerenciarUsuariosScreen() {
                 <ThemedText style={styles.formLabel}>Telefone</ThemedText>
                 <TextInput
                   style={[styles.formInput, { backgroundColor: Colors[theme].card, color: Colors[theme].text }]}
-                  value={formData.telefone}
-                  onChangeText={(text) => setFormData({...formData, telefone: text})}
+                  value={formData.numero}
+                  onChangeText={(text) => setFormData({...formData, numero: text})}
                   placeholder="(11) 99999-9999"
                   placeholderTextColor={Colors[theme].icon}
                   keyboardType="phone-pad"
@@ -681,13 +684,13 @@ export default function GerenciarUsuariosScreen() {
                         key={nivel}
                         style={[
                           styles.pickerOption,
-                          formData.nivel === nivel && { backgroundColor: Colors[theme].accent }
+                          formData.faixa === nivel && { backgroundColor: Colors[theme].accent }
                         ]}
-                        onPress={() => setFormData({...formData, nivel})}
+                        onPress={() => setFormData({...formData, faixa: nivel})}
                       >
                         <ThemedText style={[
                           styles.pickerOptionText,
-                          formData.nivel === nivel && { color: '#FFFFFF' }
+                          formData.faixa === nivel && { color: '#FFFFFF' }
                         ]}>{nivel}</ThemedText>
                       </TouchableOpacity>
                     ))}
@@ -699,8 +702,8 @@ export default function GerenciarUsuariosScreen() {
                 <ThemedText style={styles.formLabel}>Endereço</ThemedText>
                 <TextInput
                   style={[styles.formInput, { backgroundColor: Colors[theme].card, color: Colors[theme].text }]}
-                  value={formData.endereco}
-                  onChangeText={(text) => setFormData({...formData, endereco: text})}
+                  value={formData.numero}
+                  onChangeText={(text) => setFormData({...formData, numero: text})}
                   placeholder="Endereço completo"
                   placeholderTextColor={Colors[theme].icon}
                   multiline
@@ -711,8 +714,8 @@ export default function GerenciarUsuariosScreen() {
                 <ThemedText style={styles.formLabel}>Observações</ThemedText>
                 <TextInput
                   style={[styles.formInput, { backgroundColor: Colors[theme].card, color: Colors[theme].text }]}
-                  value={formData.observacoes}
-                  onChangeText={(text) => setFormData({...formData, observacoes: text})}
+                  value={formData.descricao}
+                  onChangeText={(text) => setFormData({...formData, descricao: text})}
                   placeholder="Observações sobre o aluno"
                   placeholderTextColor={Colors[theme].icon}
                   multiline

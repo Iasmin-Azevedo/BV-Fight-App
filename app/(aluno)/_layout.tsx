@@ -16,7 +16,7 @@ export default function AlunoLayout() {
         headerTintColor: '#fff',
         headerTitleStyle: {
           fontWeight: 'bold',
-          textTransform: 'capitalize',
+          // textTransform: 'capitalize', // Removido - não suportado no React Native
         },
         headerTitleAlign: 'center',
         contentStyle: {

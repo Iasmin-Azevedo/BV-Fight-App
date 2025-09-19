@@ -1,7 +1,7 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View, Text, ActivityIndicator } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import React from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IconSymbol } from './IconSymbol';
 
 interface ButtonProps {
@@ -36,8 +36,8 @@ export function Button({
     switch (variant) {
       case 'primary':
         return {
-          backgroundColor: Colors[colorScheme].accent,
-          borderColor: Colors[colorScheme].accent,
+          backgroundColor: Colors[colorScheme || 'light'].accent,
+          borderColor: Colors[colorScheme || 'light'].accent,
         };
       case 'secondary':
         return {
@@ -47,17 +47,17 @@ export function Button({
       case 'outline':
         return {
           backgroundColor: 'transparent',
-          borderColor: Colors[colorScheme].accent,
+          borderColor: Colors[colorScheme || 'light'].accent,
         };
       case 'danger':
         return {
-          backgroundColor: Colors.belts.red,
-          borderColor: Colors.belts.red,
+          backgroundColor: '#F44336',
+          borderColor: '#F44336',
         };
       default:
         return {
-          backgroundColor: Colors[colorScheme].accent,
-          borderColor: Colors[colorScheme].accent,
+          backgroundColor: Colors[colorScheme || 'light'].accent,
+          borderColor: Colors[colorScheme || 'light'].accent,
         };
     }
   };
@@ -101,9 +101,9 @@ export function Button({
       case 'danger':
         return '#FFFFFF';
       case 'secondary':
-        return Colors[colorScheme].text;
+        return Colors[colorScheme || 'light'].text;
       case 'outline':
-        return Colors[colorScheme].accent;
+        return Colors[colorScheme || 'light'].accent;
       default:
         return '#FFFFFF';
     }
@@ -156,7 +156,7 @@ export function Button({
         <View style={styles.contentContainer}>
           {icon && iconPosition === 'left' && (
             <IconSymbol 
-              name={icon} 
+              name={icon as any} 
               size={getIconSize()} 
               color={getTextColor()} 
               style={styles.leftIcon} 
@@ -172,7 +172,7 @@ export function Button({
           
           {icon && iconPosition === 'right' && (
             <IconSymbol 
-              name={icon} 
+              name={icon as any} 
               size={getIconSize()} 
               color={getTextColor()} 
               style={styles.rightIcon} 

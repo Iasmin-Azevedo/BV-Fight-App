@@ -1,7 +1,7 @@
-import React from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import React from 'react';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { IconSymbol } from './IconSymbol';
 
 interface SearchBarProps {
@@ -34,27 +34,27 @@ export function SearchBar({
     <View 
       style={[
         styles.container, 
-        { backgroundColor: Colors[colorScheme].card },
+        { backgroundColor: Colors[colorScheme || 'light'].card },
         style
       ]}
     >
       <IconSymbol 
         name="magnifyingglass" 
         size={20} 
-        color={Colors[colorScheme].text} 
+        color={Colors[colorScheme || 'light'].text} 
         style={styles.searchIcon} 
       />
       
       <TextInput
         style={[
           styles.input,
-          { color: Colors[colorScheme].text }
+          { color: Colors[colorScheme || 'light'].text }
         ]}
         value={value}
         onChangeText={onChangeText}
         onSubmitEditing={onSubmit}
         placeholder={placeholder}
-        placeholderTextColor={Colors[colorScheme].tabIconDefault}
+        placeholderTextColor={Colors[colorScheme || 'light'].tabIconDefault}
         autoCapitalize="none"
         autoCorrect={false}
         returnKeyType="search"
@@ -66,7 +66,7 @@ export function SearchBar({
           <IconSymbol 
             name="xmark.circle.fill" 
             size={20} 
-            color={Colors[colorScheme].tabIconDefault} 
+            color={Colors[colorScheme || 'light'].tabIconDefault} 
           />
         </TouchableOpacity>
       )}

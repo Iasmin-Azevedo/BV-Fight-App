@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
+import { AgendamentoSemanal, AgendamentoService } from '@/firebase/agendamentoService';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 interface Treino {
@@ -31,7 +32,8 @@ export default function TreinosScreen() {
   const theme = colorScheme || 'light';
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
-  
+  const [agendamentos, setAgendamentos] = useState<AgendamentoSemanal[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [tarefas, setTarefas] = useState<TarefaPessoal[]>([
     { id: '1', texto: 'Treinar guarda 3x por semana', concluida: false },
@@ -45,83 +47,45 @@ export default function TreinosScreen() {
   const [modoFoco, setModoFoco] = useState(false);
   
   useEffect(() => {
+    loadAgendamentos();
     if (modoFoco) {
       console.log('Modo foco ativado - priorizando treinos pendentes');
     }
   }, [modoFoco]);
-  
-  const [treinos] = useState<Treino[]>([
-    {
-      id: '1',
-      nome: 'Treino de Guarda',
-      categoria: 'Guarda',
-      duracao: '45 min',
-      nivel: 'Intermediário',
-      tecnicas: 8,
-      descricao: 'Treino focado em técnicas de guarda',
-      thumbnail: 'https://picsum.photos/300/200?random=10',
-      progresso: 75
-    },
-    {
-      id: '2',
-      nome: 'Treino de Passagem',
-      categoria: 'Passagem',
-      duracao: '30 min',
-      nivel: 'Avançado',
-      tecnicas: 6,
-      descricao: 'Treino de passagem de guarda',
-      thumbnail: 'https://picsum.photos/300/200?random=11',
-      progresso: 0
-    },
-    {
-      id: '3',
-      nome: 'Treino de Finalização',
-      categoria: 'Finalização',
-      duracao: '40 min',
-      nivel: 'Básico',
-      tecnicas: 10,
-      descricao: 'Treino de finalizações básicas',
-      thumbnail: 'https://picsum.photos/300/200?random=12',
-      progresso: 100
-    },
-    {
-      id: '4',
-      nome: 'Treino de Defesa',
-      categoria: 'Defesa',
-      duracao: '35 min',
-      nivel: 'Intermediário',
-      tecnicas: 7,
-      descricao: 'Treino focado em defesas',
-      thumbnail: 'https://picsum.photos/300/200?random=13',
-      progresso: 25
-    },
-    {
-      id: '5',
-      nome: 'Treino de Competição',
-      categoria: 'Competição',
-      duracao: '60 min',
-      nivel: 'Avançado',
-      tecnicas: 12,
-      descricao: 'Treino preparatório para competição',
-      thumbnail: 'https://picsum.photos/300/200?random=14',
-      progresso: 0
-    }
-  ]);
 
-  const categories = ['todos', 'Guarda', 'Passagem', 'Finalização', 'Defesa', 'Competição'];
+  const loadAgendamentos = async () => {
+    try {
+      setLoading(true);
+      const agendamentosData = await AgendamentoService.getAgendamentosAtivos();
+      setAgendamentos(agendamentosData);
+    } catch (error) {
+      console.error('Erro ao carregar agendamentos:', error);
+      Alert.alert('Erro', 'Erro ao carregar treinos semanais');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const categories = ['todos', 'Guarda', 'Passagem', 'Finalização', 'Defesa', 'Competição', 'Posição'];
 
   const handleBack = () => {
     router.back();
   };
 
-  const handleTreinoPress = (treino: Treino) => {
-    console.log('Treino selecionado:', treino.nome);
+  const handleAgendamentoPress = (agendamento: AgendamentoSemanal) => {
+    console.log('Agendamento selecionado:', agendamento.nome);
+    Alert.alert(
+      'Treino Semanal',
+      `${agendamento.nome}\n\n📅 ${agendamento.diaSemana}\n🕐 ${agendamento.horarioInicio} - ${agendamento.horarioFim}\n📚 ${agendamento.categoria}\n⭐ ${agendamento.nivel}\n👥 ${agendamento.maxAlunos} vagas\n\n${agendamento.descricao || 'Sem descrição'}`,
+      [{ text: 'OK' }]
+    );
   };
 
-  const filteredTreinos = treinos.filter(treino => {
-    const matchesSearch = treino.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         treino.descricao.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'todos' || treino.categoria === selectedCategory;
+  const filteredAgendamentos = agendamentos.filter(agendamento => {
+    const matchesSearch = agendamento.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         agendamento.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         agendamento.diaSemana.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'todos' || agendamento.categoria === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -137,12 +101,12 @@ export default function TreinosScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 
         {/* Campo de busca */}
-        <View style={[styles.searchContainer, { backgroundColor: Colors[colorScheme].card }]}>
-          <IconSymbol name="magnifyingglass" size={20} color={Colors[colorScheme].icon} />
+        <View style={[styles.searchContainer, { backgroundColor: Colors[theme].card }]}>
+          <IconSymbol name="magnifyingglass" size={20} color={Colors[theme].icon} />
           <TextInput
-            style={[styles.searchInput, { color: Colors[colorScheme].text }]}
-            placeholder="Buscar treinos..."
-            placeholderTextColor={Colors[colorScheme].icon}
+            style={[styles.searchInput, { color: Colors[theme].text }]}
+            placeholder="Buscar treinos semanais..."
+            placeholderTextColor={Colors[theme].icon}
             value={searchTerm}
             onChangeText={setSearchTerm}
           />
@@ -155,7 +119,7 @@ export default function TreinosScreen() {
               key={category}
               style={[
                 styles.categoryButton,
-                selectedCategory === category && { backgroundColor: Colors[colorScheme].accent }
+                selectedCategory === category && { backgroundColor: Colors[theme].accent }
               ]}
               onPress={() => setSelectedCategory(category)}
             >
@@ -177,7 +141,7 @@ export default function TreinosScreen() {
             style={styles.tarefasHeader}
             onPress={() => setMostrarTarefas(!mostrarTarefas)}
           >
-            <ThemedText style={styles.tarefasTitle}>Minhas Tarefas de Treino</ThemedText>
+            <ThemedText style={styles.tarefasTitle}>Minhas Metas de Treino</ThemedText>
             <IconSymbol 
               name={mostrarTarefas ? "chevron.up" : "chevron.down"} 
               size={20} 
@@ -220,7 +184,7 @@ export default function TreinosScreen() {
                       setTarefas(novasTarefas);
                     }}
                   >
-                    <IconSymbol name="trash" size={18} color={Colors[theme].error} />
+                    <IconSymbol name="trash" size={18} color="#F44336" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -257,76 +221,61 @@ export default function TreinosScreen() {
           )}
         </View>
 
-        {/* Lista de treinos */}
+        {/* Lista de treinos semanais */}
         <View style={styles.treinosContainer}>
-          {filteredTreinos.map((treino) => (
-            <TouchableOpacity
-              key={treino.id}
-              style={[styles.treinoCard, { backgroundColor: Colors[colorScheme].card }]}
-              onPress={() => handleTreinoPress(treino)}
-            >
-              <Image source={{ uri: treino.thumbnail }} style={styles.treinoThumbnail} />
-              <View style={styles.treinoInfo}>
-                <View style={styles.treinoHeader}>
-                  <ThemedText style={styles.treinoNome}>{treino.nome}</ThemedText>
-                  <View style={styles.progressContainer}>
-                    <View style={[styles.progressBar, { backgroundColor: '#E0E0E0' }]}>
-                      <View 
-                        style={[
-                          styles.progressFill, 
-                          { 
-                            width: `${treino.progresso}%`,
-                            backgroundColor: getProgressColor(treino.progresso)
-                          }
-                        ]} 
-                      />
-                    </View>
-                    <ThemedText style={styles.progressText}>{treino.progresso}%</ThemedText>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ThemedText style={styles.loadingText}>Carregando treinos semanais...</ThemedText>
+            </View>
+          ) : filteredAgendamentos.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <IconSymbol name="calendar" size={48} color={Colors[theme].icon} />
+              <ThemedText style={styles.emptyText}>Nenhum treino semanal encontrado</ThemedText>
+            </View>
+          ) : (
+            filteredAgendamentos.map((agendamento) => (
+              <TouchableOpacity
+                key={agendamento.id}
+                style={[styles.treinoCard, { backgroundColor: Colors[theme].card }]}
+                onPress={() => handleAgendamentoPress(agendamento)}
+              >
+                <View style={styles.agendamentoHeader}>
+                  <View style={styles.agendamentoIcon}>
+                    <IconSymbol name="calendar" size={24} color={Colors[theme].accent} />
+                  </View>
+                  <View style={styles.agendamentoInfo}>
+                    <ThemedText style={styles.treinoNome}>{agendamento.nome}</ThemedText>
+                    <ThemedText style={styles.agendamentoDia}>{agendamento.diaSemana}</ThemedText>
+                  </View>
+                  <View style={styles.agendamentoHorario}>
+                    <ThemedText style={styles.horarioText}>{agendamento.horarioInicio}</ThemedText>
+                    <ThemedText style={styles.horarioText}>{agendamento.horarioFim}</ThemedText>
                   </View>
                 </View>
                 
-                <ThemedText style={styles.treinoDescricao}>{treino.descricao}</ThemedText>
+                <ThemedText style={styles.treinoDescricao}>{agendamento.descricao || 'Treino semanal da academia'}</ThemedText>
                 
                 <View style={styles.treinoDetails}>
                   <View style={styles.detailItem}>
-                    <IconSymbol name="tag.fill" size={12} color={Colors[colorScheme].icon} />
-                    <ThemedText style={styles.detailText}>{treino.categoria}</ThemedText>
+                    <IconSymbol name="tag.fill" size={12} color={Colors[theme].icon} />
+                    <ThemedText style={styles.detailText}>{agendamento.categoria}</ThemedText>
                   </View>
                   <View style={styles.detailItem}>
-                    <IconSymbol name="clock.fill" size={12} color={Colors[colorScheme].icon} />
-                    <ThemedText style={styles.detailText}>{treino.duracao}</ThemedText>
+                    <IconSymbol name="clock.fill" size={12} color={Colors[theme].icon} />
+                    <ThemedText style={styles.detailText}>{agendamento.duracao} min</ThemedText>
                   </View>
                   <View style={styles.detailItem}>
-                    <IconSymbol name="star.fill" size={12} color={Colors[colorScheme].icon} />
-                    <ThemedText style={styles.detailText}>{treino.nivel}</ThemedText>
+                    <IconSymbol name="star.fill" size={12} color={Colors[theme].icon} />
+                    <ThemedText style={styles.detailText}>{agendamento.nivel}</ThemedText>
                   </View>
                   <View style={styles.detailItem}>
-                    <IconSymbol name="figure.martial.arts" size={12} color={Colors[colorScheme].icon} />
-                    <ThemedText style={styles.detailText}>{treino.tecnicas} técnicas</ThemedText>
+                    <IconSymbol name="person.3.fill" size={12} color={Colors[theme].icon} />
+                    <ThemedText style={styles.detailText}>{agendamento.maxAlunos} vagas</ThemedText>
                   </View>
                 </View>
-                
-                <View style={styles.treinoActions}>
-                  {treino.progresso === 0 ? (
-                    <TouchableOpacity style={styles.startButton}>
-                      <IconSymbol name="play.circle.fill" size={20} color="#FFFFFF" />
-                      <ThemedText style={styles.startButtonText}>Iniciar</ThemedText>
-                    </TouchableOpacity>
-                  ) : treino.progresso === 100 ? (
-                    <TouchableOpacity style={styles.reviewButton}>
-                      <IconSymbol name="eye.circle.fill" size={20} color={Colors[colorScheme].accent} />
-                      <ThemedText style={styles.reviewButtonText}>Revisar</ThemedText>
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity style={styles.continueButton}>
-                      <IconSymbol name="arrow.right.circle.fill" size={20} color="#FFFFFF" />
-                      <ThemedText style={styles.continueButtonText}>Continuar</ThemedText>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </ScrollView>
     </ThemedView>
@@ -491,6 +440,7 @@ const styles = StyleSheet.create({
   treinoCard: {
     borderRadius: 12,
     marginBottom: 16,
+    padding: 16,
     overflow: 'hidden',
     elevation: 2,
     shadowColor: '#000',
@@ -503,7 +453,7 @@ const styles = StyleSheet.create({
     height: 150,
   },
   treinoInfo: {
-    padding: 16,
+    // padding removido - agora está no treinoCard
   },
   treinoHeader: {
     flexDirection: 'row',
@@ -600,5 +550,68 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 4,
+  },
+  // Estilos para agendamentos
+  agendamentoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  agendamentoIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  agendamentoInfo: {
+    flex: 1,
+  },
+  agendamentoDia: {
+    fontSize: 14,
+    opacity: 0.7,
+    marginTop: 2,
+  },
+  agendamentoHorario: {
+    alignItems: 'flex-end',
+  },
+  horarioText: {
+    fontSize: 12,
+    fontWeight: '600',
+    opacity: 0.8,
+  },
+  infoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.light.accent,
+  },
+  infoButtonText: {
+    color: Colors.light.accent,
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    opacity: 0.7,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    opacity: 0.7,
+    marginTop: 12,
   },
 });
